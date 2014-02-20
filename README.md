@@ -8,24 +8,23 @@ The resulting NSDictionary may then be serialised (Using NSJSONSerialization for
 Use cases:
 Makes it very easy to construct queries to send to mongodb based backend platforms such as Deployd
 
-Supported query types:
+##Supported query types:
+###logical
+-  $not
+-  $and
+-  $or
 
-logical
-$not
-$and
-$or
+###comparison
+-  $lt
+-  $lte
+-  $gt
+-  $gte
+-  $ne
+-  $regex
 
-comparison
-$lt
-$lte
-$gt
-$gte
-$ne
-$regex
+###membership
+-  $in
+-  $geoWithin
 
-membership
-$in
-$geoWithin
-
-javascript
-$where
+###javascript
+-  $where
