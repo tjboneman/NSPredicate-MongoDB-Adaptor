@@ -408,22 +408,41 @@ NSString *const jsEqualsOperator = @"===";
 }
 
 +(NSDictionary *) transformExpressions:(NSArray *)expressions
-                 withOperator:(NSString *)operator
+                          withOperator:(NSString *)operator
 {
-    NSDictionary *result = [NSMutableDictionary new];
+    NSDictionary *result = nil;
     
-    id field = [MongoDBPredicateAdaptor transformExpression:expressions[0] modifyingOperator:&operator];
-    id param = [MongoDBPredicateAdaptor transformExpression:expressions[1] modifyingOperator:&operator];
+    NSExpression *leftExpression = expressions[0];
+    NSExpression *rightExpression = expressions[1];
     
-    if ([operator isEqualToString:@"eq"]) {
-        [result setValue:param forKey:field];
+    if (
+        (leftExpression.expressionType == NSKeyPathExpressionType && rightExpression.expressionType == NSConstantValueExpressionType) ||
+        (leftExpression.expressionType == NSConstantValueExpressionType && rightExpression.expressionType == NSKeyPathExpressionType)
+    ) {
+        NSExpression *keyPathExpression = leftExpression.expressionType == NSKeyPathExpressionType ? leftExpression : rightExpression;
+        NSExpression *constantValueExpression = leftExpression.expressionType == NSConstantValueExpressionType ? leftExpression : rightExpression;
+        NSString *keyPath = keyPathExpression.keyPath;
+        if ([keyPath hasSuffix:@".@count"]) {
+            keyPath = [keyPath substringToIndex:keyPath.length - @".@count".length];
+            id value = [MongoDBPredicateAdaptor transformConstant:constantValueExpression.constantValue
+                                                modifyingOperator:&operator];
+            result = @{keyPath : @{@"$size" : value}};
+        }
     }
-    else{
-        NSDictionary *query = @{operator:param};
-        result = @{field:query};
+    
+    if (!result) {
+        id field = [MongoDBPredicateAdaptor transformExpression:expressions[0] modifyingOperator:&operator];
+        id param = [MongoDBPredicateAdaptor transformExpression:expressions[1] modifyingOperator:&operator];
+        
+        if ([operator isEqualToString:@"eq"]) {
+            result = @{field : param};
+        } else {
+            NSDictionary *query = @{operator:param};
+            result = @{field:query};
+        }
     }
     
-    return result;
+    return result != nil ? result : @{};
 }
 
 +(NSExpression*)ensureKeyPathExpressionsContainJSThisInExpression:(NSExpression*)expression{
