@@ -546,7 +546,7 @@ NSString *const jsEqualsOperator = @"===";
         [polygon getCoordinates:coords range:NSMakeRange(0,polygon.pointCount)];
         NSMutableArray *coordArray = [[NSMutableArray alloc]initWithCapacity:polygon.pointCount];
         for (int i = 0; i < polygon.pointCount; i++) {
-            CLLocationCoordinate2D coord = coords[0];
+            CLLocationCoordinate2D coord = coords[i];
             coordArray[i] = @[@(coord.longitude),@(coord.latitude)];
         }
         result = @{@"$geometry":@{@"type":@"Polygon", @"coordinates":coordArray}};        
