@@ -262,7 +262,7 @@ NSString *const jsEqualsOperator = @"===";
     NSPredicate *newPredicate = nil;
     id constant = predicate.rightExpression.constantValue;
     if (constant) {
-        NSString *beginsWithRegex = [NSString stringWithFormat:@"/^%@/",predicate.rightExpression.constantValue];
+        NSString *beginsWithRegex = [NSString stringWithFormat:@"^%@",predicate.rightExpression.constantValue];
         newPredicate = [MongoDBPredicateAdaptor replacementPredicateForPredicate:predicate withRegexString:beginsWithRegex];
     }
     return newPredicate;
@@ -272,7 +272,7 @@ NSString *const jsEqualsOperator = @"===";
     NSPredicate *newPredicate = nil;
     id constant = predicate.rightExpression.constantValue;
     if (constant) {
-        NSString *endsWithRegex = [NSString stringWithFormat:@"/.*%@/",predicate.rightExpression.constantValue];
+        NSString *endsWithRegex = [NSString stringWithFormat:@".*%@",predicate.rightExpression.constantValue];
         newPredicate = [MongoDBPredicateAdaptor replacementPredicateForPredicate:predicate withRegexString:endsWithRegex];
     }
     return newPredicate;
@@ -282,7 +282,7 @@ NSString *const jsEqualsOperator = @"===";
     NSPredicate *newPredicate = nil;
     id constant = predicate.rightExpression.constantValue;
     if (constant) {
-        NSString *containsRegex = [NSString stringWithFormat:@"/.*%@.*/",predicate.rightExpression.constantValue];
+        NSString *containsRegex = [NSString stringWithFormat:@".*%@.*",predicate.rightExpression.constantValue];
         newPredicate = [MongoDBPredicateAdaptor replacementPredicateForPredicate:predicate withRegexString:containsRegex];
     }
     return newPredicate;
@@ -497,10 +497,12 @@ NSString *const jsEqualsOperator = @"===";
     else if ([constant isKindOfClass:[NSSet class]]){
         result = [MongoDBPredicateAdaptor transformSetConstant:constant];
     }
+#if !TARGET_OS_WATCH
     else if ([constant isKindOfClass:[MKShape class]]){
         result = [MongoDBPredicateAdaptor transformGeoShapeConstant:constant];
         *operator = geoInOperator;
     }
+#endif
     
     return result;
 }
@@ -532,7 +534,9 @@ NSString *const jsEqualsOperator = @"===";
 +(NSArray *) transformSetConstant:(NSSet *)set{
     return [set allObjects];
 }
-              
+
+#if !TARGET_OS_WATCH
+
 +(NSDictionary*)transformGeoShapeConstant:(MKShape*)constant{
     NSDictionary *result = nil;
     if ([constant isKindOfClass:[MKCircle class]]) {
@@ -554,5 +558,6 @@ NSString *const jsEqualsOperator = @"===";
     return result;
 }
 
+#endif
 
 @end
