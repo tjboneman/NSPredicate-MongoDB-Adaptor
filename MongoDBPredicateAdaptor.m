@@ -553,7 +553,7 @@ NSString *const jsEqualsOperator = @"===";
             CLLocationCoordinate2D coord = coords[i];
             coordArray[i] = @[@(coord.longitude),@(coord.latitude)];
         }
-        result = @{@"$geometry":@{@"type":@"Polygon", @"coordinates":coordArray}};        
+        result = @{@"$polygon":coordArray};        
     }
     return result;
 }
