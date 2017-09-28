@@ -310,7 +310,7 @@ extension NSPredicate {
             keyPathConstantTuple.keyPathExpression.keyPath.hasSuffix(".@count")
         {
             var keyPath = keyPathConstantTuple.keyPathExpression.keyPath
-            keyPath = keyPath.substring(to: keyPath.index(keyPath.endIndex, offsetBy: -(".@count".characters.count)))
+            keyPath = String(keyPath[...keyPath.index(keyPath.endIndex, offsetBy: -(".@count".characters.count) - 1)])
             let value = transform(constant: keyPathConstantTuple.constantValueExpression.constantValue, modifyingOperator: &`operator`)
             return [keyPath : ["$size" : value]]
         }
@@ -399,5 +399,30 @@ extension NSPredicate {
         return nil
     }
     #endif
+    
+}
+
+extension NSComparisonPredicate {
+    
+    var keyPathConstantTuple: (keyPathExpression: NSExpression, constantValueExpression: NSExpression)? {
+        switch leftExpression.expressionType {
+        case .keyPath:
+            switch rightExpression.expressionType {
+            case .constantValue:
+                return (keyPathExpression: leftExpression, constantValueExpression: rightExpression)
+            default:
+                return nil
+            }
+        case .constantValue:
+            switch rightExpression.expressionType {
+            case .keyPath:
+                return (keyPathExpression: rightExpression, constantValueExpression: leftExpression)
+            default:
+                return nil
+            }
+        default:
+            return nil
+        }
+    }
     
 }
