@@ -310,7 +310,12 @@ extension NSPredicate {
             keyPathConstantTuple.keyPathExpression.keyPath.hasSuffix(".@count")
         {
             var keyPath = keyPathConstantTuple.keyPathExpression.keyPath
-            keyPath = String(keyPath[...keyPath.index(keyPath.endIndex, offsetBy: -(".@count".characters.count) - 1)])
+            #if swift(>=4.0)
+                let countOffset = ".@count".count
+            #else
+                let countOffset = ".@count".characters.count
+            #endif
+            keyPath = String(keyPath[...keyPath.index(keyPath.endIndex, offsetBy: -countOffset - 1)])
             let value = transform(constant: keyPathConstantTuple.constantValueExpression.constantValue, modifyingOperator: &`operator`)
             return [keyPath : ["$size" : value]]
         }
