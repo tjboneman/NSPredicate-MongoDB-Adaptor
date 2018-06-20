@@ -106,7 +106,7 @@ extension NSCompoundPredicate {
 
 extension NSPredicate {
     
-    var mongoDBQuery: [String : Any]? {
+    public var mongoDBQuery: [String : Any]? {
         var result: [String : Any]? = nil
         if let predicate = self as? NSComparisonPredicate {
             result = transform(comparisonPredicate: predicate)
