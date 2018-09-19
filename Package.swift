@@ -21,5 +21,6 @@ let package = Package(
         .target(
             name: "MongoDBPredicateAdaptor",
             dependencies: []),
-    ]
+    ],
+    swiftLanguageVersions: [.v4, .v4_2]
 )
