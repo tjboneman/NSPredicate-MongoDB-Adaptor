@@ -21,6 +21,12 @@ let package = Package(
         .target(
             name: "MongoDBPredicateAdaptor",
             dependencies: []),
+        .testTarget(
+            name: "MongoDBPredicateAdaptorTests",
+            dependencies: [
+                "MongoDBPredicateAdaptor",
+            ]
+        ),
     ],
     swiftLanguageVersions: [.v4, .v4_2]
 )
