@@ -123,7 +123,7 @@ extension NSPredicate {
                 key == MongoDBOperator.and.rawValue,
                 let value = _value as? [[String : Any]],
                 let sequence = Optional(value.filter({ $0.count == 1 }).compactMap({ $0.first })),
-                value.count == sequence.count
+                value.count == Set(sequence.map{ $0.key }).count
             {
                 result = [String : Any](uniqueKeysWithValues: sequence)
             }
