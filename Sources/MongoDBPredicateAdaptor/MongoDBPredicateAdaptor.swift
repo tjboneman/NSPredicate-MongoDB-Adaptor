@@ -8,7 +8,7 @@
 
 import Foundation
 
-#if !os(watchOS)
+#if canImport(MapKit)
     import MapKit
 #endif
 
@@ -107,11 +107,26 @@ extension NSCompoundPredicate {
 extension NSPredicate {
     
     public var mongoDBQuery: [String : Any]? {
+        return mongoDBQuery()
+    }
+    
+    public func mongoDBQuery(optimize: Bool = true) -> [String : Any]? {
         var result: [String : Any]? = nil
         if let predicate = self as? NSComparisonPredicate {
             result = transform(comparisonPredicate: predicate)
         } else if let predicate = self as? NSCompoundPredicate {
             result = transform(compoundPredicate: predicate)
+            if optimize,
+                let _result = result,
+                _result.count == 1,
+                let (key, _value) = _result.first,
+                key == MongoDBOperator.and.rawValue,
+                let value = _value as? [[String : Any]],
+                let sequence = Optional(value.filter({ $0.count == 1 }).compactMap({ $0.first })),
+                value.count == Set(sequence.map{ $0.key }).count
+            {
+                result = [String : Any](uniqueKeysWithValues: sequence)
+            }
         }
         return result
     }
@@ -372,7 +387,7 @@ extension NSPredicate {
         } else if let set = constant as? NSSet {
             return set.allObjects
         }
-#if !os(watchOS)
+#if canImport(MapKit)
         if let shape = constant as? MKShape {
             `operator` = .geoIn
             return transform(geoShape: shape)
@@ -382,7 +397,7 @@ extension NSPredicate {
         return nil
     }
     
-    #if !os(watchOS)
+    #if canImport(MapKit)
     private func transform(geoShape: MKShape) -> [String : Any]? {
         if let circle = geoShape as? MKCircle {
             return [
