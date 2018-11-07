@@ -387,7 +387,7 @@ extension NSPredicate {
         } else if let set = constant as? NSSet {
             return set.allObjects
         }
-#if canImport(MapKit)
+#if canImport(MapKit) && !os(watchOS)
         if let shape = constant as? MKShape {
             `operator` = .geoIn
             return transform(geoShape: shape)
@@ -397,7 +397,7 @@ extension NSPredicate {
         return nil
     }
     
-    #if canImport(MapKit)
+    #if canImport(MapKit) && !os(watchOS)
     private func transform(geoShape: MKShape) -> [String : Any]? {
         if let circle = geoShape as? MKCircle {
             return [
