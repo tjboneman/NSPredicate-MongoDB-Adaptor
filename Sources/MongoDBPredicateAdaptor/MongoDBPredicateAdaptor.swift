@@ -148,13 +148,28 @@ extension NSPredicate {
     }
     
     private func transform(predicates: [NSPredicate], operator: MongoDBOperator) -> [String : Any]? {
-        var subPredicates = [[String : Any]]()
-        for predicate in predicates {
-            if let subResult = predicate.mongoDBQuery {
-                subPredicates.append(subResult)
+        if predicates.count == 1,
+            `operator` == .not,
+            let predicate = predicates.first as? NSComparisonPredicate,
+            let mongoDBOperator = predicate.mongoDBOperator,
+            let (keyPath, value) = predicate.keyPathConstantTuple
+        {
+            return [
+                keyPath.keyPath : [
+                    `operator`.rawValue : [
+                        mongoDBOperator.rawValue : value.constantValue ?? NSNull()
+                    ]
+                ]
+            ]
+        } else {
+            var subPredicates = [[String : Any]]()
+            for predicate in predicates {
+                if let subResult = predicate.mongoDBQuery {
+                    subPredicates.append(subResult)
+                }
             }
+            return [`operator`.rawValue : subPredicates]
         }
-        return [`operator`.rawValue : subPredicates]
     }
     
     private func transform(compoundPredicate predicate: NSCompoundPredicate) -> [String : Any]? {
