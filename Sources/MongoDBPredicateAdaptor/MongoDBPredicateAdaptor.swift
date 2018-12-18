@@ -161,15 +161,10 @@ extension NSPredicate {
                     ]
                 ]
             ]
-        } else {
-            var subPredicates = [[String : Any]]()
-            for predicate in predicates {
-                if let subResult = predicate.mongoDBQuery {
-                    subPredicates.append(subResult)
-                }
-            }
-            return [`operator`.rawValue : subPredicates]
         }
+        
+        let subPredicates = predicates.compactMap { $0.mongoDBQuery }
+        return [`operator`.rawValue : subPredicates]
     }
     
     private func transform(compoundPredicate predicate: NSCompoundPredicate) -> [String : Any]? {
