@@ -12,7 +12,7 @@ import Foundation
     import MapKit
 #endif
 
-enum MongoDBOperator: String {
+public enum MongoDBOperator: String {
     
     //logical
     case not = "$not"
