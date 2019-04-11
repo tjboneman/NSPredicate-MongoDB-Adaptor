@@ -99,6 +99,7 @@ extension NSCompoundPredicate {
         case .not: return .not
         case .and: return .and
         case .or: return .or
+        default: fatalError("unknown compoundPredicateType \(compoundPredicateType)")
         }
     }
     
