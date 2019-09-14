@@ -435,7 +435,7 @@ extension NSPredicate {
 
 extension NSComparisonPredicate {
     
-    var keyPathConstantTuple: (keyPathExpression: NSExpression, constantValueExpression: NSExpression)? {
+    public var keyPathConstantTuple: (keyPathExpression: NSExpression, constantValueExpression: NSExpression)? {
         switch leftExpression.expressionType {
         case .keyPath:
             switch rightExpression.expressionType {
